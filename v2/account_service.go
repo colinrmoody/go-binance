@@ -32,10 +32,10 @@ func (s *GetAccountService) Do(ctx context.Context, opts ...RequestOption) (res 
 
 // Account define account info
 type Account struct {
-	MakerCommission  int64     `json:"makerCommission"`
-	TakerCommission  int64     `json:"takerCommission"`
-	BuyerCommission  int64     `json:"buyerCommission"`
-	SellerCommission int64     `json:"sellerCommission"`
+	MakerCommission  float64   `json:"makerCommission"`
+	TakerCommission  float64   `json:"takerCommission"`
+	BuyerCommission  float64   `json:"buyerCommission"`
+	SellerCommission float64   `json:"sellerCommission"`
 	CanTrade         bool      `json:"canTrade"`
 	CanWithdraw      bool      `json:"canWithdraw"`
 	CanDeposit       bool      `json:"canDeposit"`
