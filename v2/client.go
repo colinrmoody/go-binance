@@ -44,6 +44,9 @@ type SymbolStatusType string
 // SymbolFilterType define symbol filter type
 type SymbolFilterType string
 
+// UserDataEventType define spot user data event type
+type UserDataEventType string
+
 // MarginTransferType define margin transfer type
 type MarginTransferType int
 
@@ -61,6 +64,9 @@ type SideEffectType string
 
 // FuturesTransferType define futures transfer type
 type FuturesTransferType int
+
+// TransactionType define transaction type
+type TransactionType string
 
 // Endpoints
 const (
@@ -118,6 +124,11 @@ const (
 	SymbolFilterTypeMarketLotSize    SymbolFilterType = "MARKET_LOT_SIZE"
 	SymbolFilterTypeMaxNumAlgoOrders SymbolFilterType = "MAX_NUM_ALGO_ORDERS"
 
+	UserDataEventTypeOutboundAccountPosition UserDataEventType = "outboundAccountPosition"
+	UserDataEventTypeBalanceUpdate           UserDataEventType = "balanceUpdate"
+	UserDataEventTypeExecutionReport         UserDataEventType = "executionReport"
+	UserDataEventTypeListStatus              UserDataEventType = "ListStatus"
+
 	MarginTransferTypeToMargin MarginTransferType = 1
 	MarginTransferTypeToMain   MarginTransferType = 2
 
@@ -139,6 +150,11 @@ const (
 	SideEffectTypeNoSideEffect SideEffectType = "NO_SIDE_EFFECT"
 	SideEffectTypeMarginBuy    SideEffectType = "MARGIN_BUY"
 	SideEffectTypeAutoRepay    SideEffectType = "AUTO_REPAY"
+
+	TransactionTypeDeposit  TransactionType = "0"
+	TransactionTypeWithdraw TransactionType = "1"
+	TransactionTypeBuy      TransactionType = "0"
+	TransactionTypeSell     TransactionType = "1"
 
 	timestampKey  = "timestamp"
 	signatureKey  = "signature"
@@ -185,8 +201,8 @@ func NewClient(apiKey, secretKey string, baseURL string) *Client {
 }
 
 // NewFuturesClient initialize client for futures API
-func NewFuturesClient(apiKey, secretKey string) *futures.Client {
-	return futures.NewClient(apiKey, secretKey)
+func NewFuturesClient(apiKey, secretKey, baseURL string) *futures.Client {
+	return futures.NewClient(apiKey, secretKey, baseURL)
 }
 
 // NewDeliveryClient initialize client for coin-M futures API
@@ -309,7 +325,7 @@ func (c *Client) callAPI(ctx context.Context, r *request, opts ...RequestOption)
 	c.debug("response body: %s", string(data))
 	c.debug("response status code: %d", res.StatusCode)
 
-	if res.StatusCode >= 400 {
+	if res.StatusCode >= http.StatusBadRequest {
 		apiErr := new(common.APIError)
 		e := json.Unmarshal(data, apiErr)
 		if e != nil {
@@ -413,6 +429,31 @@ func (c *Client) NewListOrdersService() *ListOrdersService {
 // NewGetAccountService init getting account service
 func (c *Client) NewGetAccountService() *GetAccountService {
 	return &GetAccountService{c: c}
+}
+
+// NewGetAPIKeyPermission init getting API key permission
+func (c *Client) NewGetAPIKeyPermission() *GetAPIKeyPermission {
+	return &GetAPIKeyPermission{c: c}
+}
+
+// NewListSavingsFlexibleProductsService get flexible products list (Savings)
+func (c *Client) NewListSavingsFlexibleProductsService() *ListSavingsFlexibleProductsService {
+	return &ListSavingsFlexibleProductsService{c: c}
+}
+
+// NewPurchaseSavingsFlexibleProductService purchase a flexible product (Savings)
+func (c *Client) NewPurchaseSavingsFlexibleProductService() *PurchaseSavingsFlexibleProductService {
+	return &PurchaseSavingsFlexibleProductService{c: c}
+}
+
+// NewRedeemSavingsFlexibleProductService redeem a flexible product (Savings)
+func (c *Client) NewRedeemSavingsFlexibleProductService() *RedeemSavingsFlexibleProductService {
+	return &RedeemSavingsFlexibleProductService{c: c}
+}
+
+// NewListSavingsFixedAndActivityProductsService get fixed and activity product list (Savings)
+func (c *Client) NewListSavingsFixedAndActivityProductsService() *ListSavingsFixedAndActivityProductsService {
+	return &ListSavingsFixedAndActivityProductsService{c: c}
 }
 
 // NewGetAccountSnapshotService init getting account snapshot service
@@ -623,4 +664,49 @@ func (c *Client) NewListDustLogService() *ListDustLogService {
 // NewDustTransferService init dust transfer service
 func (c *Client) NewDustTransferService() *DustTransferService {
 	return &DustTransferService{c: c}
+}
+
+// NewTransferToSubAccountService transfer to subaccount service
+func (c *Client) NewTransferToSubAccountService() *TransferToSubAccountService {
+	return &TransferToSubAccountService{c: c}
+}
+
+// NewAssetDividendService init the asset dividend list service
+func (c *Client) NewAssetDividendService() *AssetDividendService {
+	return &AssetDividendService{c: c}
+}
+
+// NewUserUniversalTransferService
+func (c *Client) NewUserUniversalTransferService() *CreateUserUniversalTransferService {
+	return &CreateUserUniversalTransferService{c: c}
+}
+
+// NewAllCoinsInformation
+func (c *Client) NewGetAllCoinsInfoService() *GetAllCoinsInfoService {
+	return &GetAllCoinsInfoService{c: c}
+}
+
+// NewDustTransferService init Get All Margin Assets service
+func (c *Client) NewGetAllMarginAssetsService() *GetAllMarginAssetsService {
+	return &GetAllMarginAssetsService{c: c}
+}
+
+// NewFiatDepositWithdrawHistoryService init the fiat deposit/withdraw history service
+func (c *Client) NewFiatDepositWithdrawHistoryService() *FiatDepositWithdrawHistoryService {
+	return &FiatDepositWithdrawHistoryService{c: c}
+}
+
+// NewFiatPaymentsHistoryService init the fiat payments history service
+func (c *Client) NewFiatPaymentsHistoryService() *FiatPaymentsHistoryService {
+	return &FiatPaymentsHistoryService{c: c}
+}
+
+// NewFiatPaymentsHistoryService init the spot rebate history service
+func (c *Client) NewSpotRebateHistoryService() *SpotRebateHistoryService {
+	return &SpotRebateHistoryService{c: c}
+}
+
+// NewConvertTradeHistoryService init the convert trade history service
+func (c *Client) NewConvertTradeHistoryService() *ConvertTradeHistoryService {
+	return &ConvertTradeHistoryService{c: c}
 }
